@@ -1,0 +1,157 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>almacenamiento interno</title>
+     <!-- Archivo CSS Bootstrap 5 -->
+     <link href="css/bootstrap.min.css" rel="stylesheet">
+ 
+     <!-- Favicons -- -->
+     <link rel="icon" href="favicon.ico">
+</head>
+<body>
+<main>
+    <!--cabecera--> 
+    <div class="container">
+        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+ 
+           <!-- Texto para el Logo -->  
+          <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+            <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"/></svg>
+            <span class="fs-4">Daniel Cano</span>
+          </a>
+ 
+           <!-- Menú -->  
+          <ul class="nav nav-pills">
+            <li class="nav-item"><a href="principal.html" class="nav-link active" aria-current="page">inicio</a></li>
+            <li class="nav-item"><a href="segundo.html" class="nav-link">validacion</a></li>
+            <li class="nav-item"><a href="seccion.html" class="nav-link">almacenamiento</a></li>          
+          </ul>
+ 
+        </header>
+      </div>
+
+</head>
+<body  onload="refrescaTodo()" class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom" >
+  <h1>almacenamaniento interno local </h1>
+<span id="mensaje"></span><br><br>
+tipo de alamacenamiento: 
+<select  onchange="actualizarTipo(this.value)"  id="tipo">
+<option value="local">LOCAL</option>
+<option  value="sesion">SESION</option>
+</select><br>
+nombre de alumno: <input type="text"  id="nAlumno"><br>
+numero de control: <input type="text" id="nControl" ><br><br>
+		<button class="btn btn-primary" onclick="guardar()" >GUARDAR</button> 
+		<button class="btn btn-primary" onclick="eliminar()">ELIMINAR</button> 
+		<button class="btn btn-primary" onclick="refrescaTodo()">REFRESCAR</button> 
+		<button class="btn btn-primary" onclick="compruebaCompatibilidad()">COMPROBAR COMPATIBILIDAD DEL NAVEGADOR</button>
+
+<br><br>
+<table>
+<tbody>
+	<tr>
+		<td class="text-white-50 bg-dark">
+			nombres y n.control en local storage:<br>
+		<textarea rows="10" cols="50" id="almacenamientoLocal" readonly="readonly"></textarea>
+		</td>
+		   <td class="text-white-50 bg-dark">
+nombres y n.control en session storage:<br>
+<textarea rows="10" cols="50" id="almacenamientoSesion" readonly="readonly"></textarea>
+</td>
+</tr>
+</tbody>
+</table>
+<p>en este ejemplo se puede ver como la informacion almacenada de forma local no desaparece al momento de cerrar la pagina </p>
+
+
+
+<script type="text/javascript">
+	
+	   // por defecto almacenamiento local
+     let storage = localStorage;
+	
+	function guardar() {
+	 	let nAlumno = document.getElementById('nAlumno').value;
+	 	let nControl = document.getElementById('nControl').value;
+	 	if (nAlumno == '' || nControl == '') {
+	 		alert('Por favor, rellena nombre del alumno y numero de control');
+	 		return;
+	 	}
+	 	storage.setItem(nAlumno, nControl);
+	 	enviaM('el registro de  ' + nAlumno + '=' + nControl + ' con area de almacenamiento ' + document.getElementById('tipo').value);
+	 	limpiar();
+	 	refrescaTodo();
+	}
+	
+
+
+	function limpiar() {
+		document.getElementById('nAlumno').value = '';
+	 	document.getElementById('nControl').value = '';
+	}
+	
+	function refrescaTodo() {
+		refrescar(localStorage, document.getElementById('almacenamientoLocal'));
+		refrescar(sessionStorage, document.getElementById('almacenamientoSesion'));
+	}
+	
+	function refrescar(storage, area) {
+		area.innerHTML = '';
+		for (let i=0; i<storage.length; i++) {
+			let nAlumno = storage.key(i);
+			let nControl = storage.getItem(nAlumno);
+			area.innerHTML += (nAlumno + '=' + nControl + '\n');
+		}
+	}
+	
+	function eliminar() {
+		let nAlumno = document.getElementById('nAlumno').value;
+	 	if (nAlumno == '') {
+	 		alert('Por favor, rellena nombre del alumno');
+	 		return;
+	 	}
+	 	storage.removeItem(nAlumno);
+	 	limpiar();
+	 	enviaM('registro eliminado con tipo de almacenamiento ' + document.getElementById('tipo').value);
+	 	refrescaTodo();
+	}
+	
+	function actualizarTipo(tipo) {
+		if (tipo == 'sesion') {
+			storage = sessionStorage;
+		} else {
+			storage = localStorage;
+		}
+	}
+	
+	function compruebaCompatibilidad() {
+		if (window.sessionStorage && window.localStorage) {			enviaM('Tu navegador acepta almacenamiento local'); 
+		} else {enviaM('Lo siento, pero tu navegador no acepta almacenamiento local');		}	}
+	
+	function enviaM(mensaje) {
+		let contenedormensaje = document.getElementById('mensaje');
+		contenedormensaje.innerHTML = mensaje;
+		setTimeout(function () {
+			contenedormensaje.innerHTML='';
+		}, 3000);
+	}
+	
+	// función que será invocada cuando se produzca un almacenamiento 
+	function eventoAlmacenamiento(e) {	
+		refrescaTodo();
+	}
+	
+	// añadimos el listener que dispará la función cuando se produzca el evento de almacenamiento
+	window.addEventListener("storage", eventoAlmacenamiento, false);
+
+</script>
+
+
+    
+</main>
+</body>
+</html>
+
+
